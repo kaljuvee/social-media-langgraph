@@ -13,7 +13,9 @@ class ContentGenerator:
         """Initialize the content generator with Claude."""
         self.llm = ChatAnthropic(
             model="claude-3-5-sonnet-20241022",
-            api_key=settings.anthropic_api_key
+            api_key=settings.anthropic_api_key,
+            timeout=30.0,
+            max_retries=2
         )
 
     async def generate_twitter_post(self, content: str, style: str = "professional") -> str:

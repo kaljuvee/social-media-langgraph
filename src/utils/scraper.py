@@ -25,7 +25,19 @@ class ContentScraper:
         """
         try:
             result = self.firecrawl.scrape(url)
-            return result
+            
+            # Convert FireCrawl Document object to dictionary
+            return {
+                "content": result.markdown or "",
+                "html": result.html or "",
+                "metadata": {
+                    "title": result.metadata.title if result.metadata else "",
+                    "description": result.metadata.description if result.metadata else "",
+                    "url": url,
+                },
+                "title": result.metadata.title if result.metadata else "",
+                "description": result.metadata.description if result.metadata else "",
+            }
         except Exception as e:
             print(f"Error scraping URL {url}: {str(e)}")
             return None
@@ -57,12 +69,7 @@ class ContentScraper:
         """
         result = await self.scrape_url(url)
         if result:
-            return {
-                "title": result.get("metadata", {}).get("title"),
-                "description": result.get("metadata", {}).get("description"),
-                "image": result.get("metadata", {}).get("image"),
-                "url": url,
-            }
+            return result.get("metadata", {})
         return None
 
 

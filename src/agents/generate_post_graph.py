@@ -63,25 +63,29 @@ async def generate_posts_node(state: GeneratePostState) -> GeneratePostState:
         posts = []
 
         for platform in platforms:
-            if platform == SocialPlatform.TWITTER:
-                post_content = await content_generator.generate_twitter_post(
-                    state["content"],
-                    style=style
-                )
-            elif platform == SocialPlatform.LINKEDIN:
-                post_content = await content_generator.generate_linkedin_post(
-                    state["content"],
-                    style=style
-                )
-            else:
-                continue
+            try:
+                if platform == SocialPlatform.TWITTER:
+                    post_content = await content_generator.generate_twitter_post(
+                        state["content"],
+                        style=style
+                    )
+                elif platform == SocialPlatform.LINKEDIN:
+                    post_content = await content_generator.generate_linkedin_post(
+                        state["content"],
+                        style=style
+                    )
+                else:
+                    continue
 
-            post = GeneratedPost(
-                platform=platform,
-                content=post_content,
-                status=PostStatus.PENDING_APPROVAL
-            )
-            posts.append(post)
+                post = GeneratedPost(
+                    platform=platform,
+                    content=post_content,
+                    status=PostStatus.PENDING_APPROVAL
+                )
+                posts.append(post)
+            except Exception as platform_error:
+                state["errors"].append(f"Error generating {platform.value} post: {str(platform_error)}")
+                continue
 
         state["posts"] = posts
         return state
